@@ -21,13 +21,19 @@
         background: none;
         border: none;
         cursor: pointer;
-        filter: brightness(0);      /* делает птицу чёрной — ворона */
         transition: transform 0.08s;
         user-select: none;
+        padding: 0; /* убирает внутренние отступы кнопки вокруг картинки */
+    }
+    .crow img {
+        width: 320px;   /* увеличенный размер картинки */
+        height: auto;   /* сохраняет пропорции персонажа */
+        display: block;
     }
     .crow:active {
-        transform: scale(0.88);     /* ворона «сжимается» при нажатии */
+        transform: scale(0.88);     /* ворона сжимается при нажатии */
     }
+
     .plus {
         position: absolute;
         top: 0;
@@ -45,13 +51,16 @@
 
 <div class="crow-zone" id="crow-zone">
     {% if current_user %}
-        <button class="crow" id="crow">🐦</button>
+        <button class="crow" id="crow">
+            <img src="{{ url_for('static', filename='images/vorona.png') }}" alt="Ворона">
+        </button>
         <p class="mt-3">Один тап = <b>1000</b> монет</p>
         <p id="tap-error" class="text-danger"></p>
     {% else %}
         <p>Чтобы лутать кещ, нужно <a href="{{ url_for('login') }}">войти</a>.</p>
     {% endif %}
 </div>
+
 
 <script>
     const crow = document.getElementById('crow');
