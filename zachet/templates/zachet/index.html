@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block title %}Апгрейдер «ЗАЧЁТ» // CYBER-UPGRADE — БУРМАЛДА{% endblock %}
+
+{% block head %}
+<!-- Стили апгрейдера Зачёт -->
+<link rel="stylesheet" href="{{ url_for('zachet.static', filename='css/style.css') }}?v=10">
+{% endblock %}
+
+{% block body %}
+{% include 'zachet/_icons.html' %}
+
+<div class="zachet-page-wrapper">
+
+  <!-- Бегущая терминальная строка последних выпадений -->
+  <div class="feed-terminal-bar">
+    <div class="feed-label-tag"><i></i>// ПОТОК_ВЫПАДЕНИЙ:</div>
+    <div class="feedrow" id="feed"></div>
+  </div>
+
+  <!-- Главное окно модуля апгрейда -->
+  <div class="terminal-window zachet-terminal-window">
+    
+    <!-- Шапка окна с навигацией по вкладкам и кнопками управления -->
+    <div class="terminal-window-header zachet-win-header">
+      <div class="zachet-header-left">
+        <span class="window-title-text">АПГРЕЙД-МОДУЛЬ // «ЗАЧЁТ» V3.2</span>
+        <nav class="tabs" id="tabs">
+          <button data-p="upgrade">[ АПГРЕЙД ]</button>
+          <button data-p="cases">[ ЯЩИКИ ]</button>
+          <button data-p="shop">[ МАГАЗИН ]</button>
+          <button data-p="profile">[ СТАТИСТИКА ]</button>
+        </nav>
+      </div>
+
+      <div class="zachet-header-right">
+        <!-- Баланс апгрейдера (синхронизируется с шапкой сайта) -->
+        <div class="wallet" title="Игровые кредиты">
+          <span class="wallet-tag">[КРЕДИТЫ:</span>
+          <span id="bal">0</span>
+          <small>🪙]</small>
+        </div>
+
+        <!-- Переключатель звука -->
+        <button class="mute-btn" id="snd" aria-label="Звук" title="Звуковой чип">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 9v6h4l5 4V5L8 9H4z"/>
+            <path id="sndw" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>
+          </svg>
+        </button>
+
+        <div class="window-controls">
+          <span class="win-btn">_</span>
+          <span class="win-btn">□</span>
+          <span class="win-btn win-close">×</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="terminal-window-body zachet-body">
+
+      <!-- ВКЛАДКА 1: АПГРЕЙД -->
+      <section class="page" id="p-upgrade">
+        <div class="bench" id="bench">
+          <!-- Колонка ставки -->
+          <div class="col stakecol">
+            <div class="hd">
+              <span class="lbl">[СТАВКА]</span>
+              <span class="lbl" id="selN"></span>
+            </div>
+            <div class="val"><span id="stakeV">0</span><small>🪙</small></div>
+            <div id="stack"></div>
+            <div class="coins">
+              <label class="lbl" for="coin">// ДОБАВИТЬ КРЕДИТЫ С БАЛАНСА:</label>
+              <input id="coin" type="number" min="0" step="1" value="0" inputmode="numeric">
+              <button type="button" data-coin="half">[½]</button>
+              <button type="button" data-coin="x2">[×2]</button>
+              <button type="button" data-coin="max">[ВСЕ]</button>
+            </div>
+          </div>
+
+          <!-- Колонка циферблата -->
+          <div class="col dial">
+            <div class="face" id="face">
+              <svg viewBox="0 0 320 320" aria-hidden="true">
+                <g id="scale"></g>
+                <circle cx="160" cy="160" r="116" fill="none" stroke="url(#hatch)" stroke-width="26"/>
+                <circle id="zone" cx="160" cy="160" r="116" fill="none" stroke="var(--accent)" stroke-width="26" stroke-dasharray="0 728.85" transform="rotate(-90 160 160)" style="transition:stroke-dasharray .35s ease"/>
+                <circle cx="160" cy="160" r="102" fill="none" stroke="var(--line)" stroke-width="1"/>
+                <circle cx="160" cy="160" r="130" fill="none" stroke="var(--line)" stroke-width="1"/>
+                <g id="needle" style="transform-origin:160px 160px">
+                  <line id="needleLine" x1="160" y1="98" x2="160" y2="26" stroke="var(--fg)" stroke-width="3"/>
+                  <path id="needleTip" d="M153 26 L167 26 L160 14 Z" fill="var(--fg)" stroke="var(--fg)" stroke-width="1"/>
+                </g>
+              </svg>
+              <div class="readout">
+                <b id="pct">0,00%</b>
+                <span id="pctL">ШАНС</span>
+              </div>
+            </div>
+
+            <div class="specs">
+              <div><span class="lbl">МНОЖИТЕЛЬ</span><b id="mul">—</b></div>
+              <div><span class="lbl">ЗОНА</span><b id="zoneV">—</b></div>
+              <div><span class="lbl">ВЫПАЛО</span><b id="roll">—</b></div>
+            </div>
+
+            <button class="run-btn" id="go" disabled>[ ВЫПОЛНИТЬ АПГРЕЙД ]</button>
+            <div class="why" id="why"></div>
+          </div>
+
+          <!-- Колонка цели -->
+          <div class="col tgtcol">
+            <div class="hd">
+              <span class="lbl">[ЦЕЛЬ]</span>
+              <button class="lbl" id="untgt" hidden>[СБРОСИТЬ ✕]</button>
+            </div>
+            <div class="target" id="tgt"></div>
+          </div>
+        </div>
+
+        <!-- Списки инвентаря и выбора целей -->
+        <div class="lists">
+          <div class="box">
+            <div class="bar">
+              <h3>// ВАШИ ПРЕДМЕТЫ</h3>
+              <input class="field" type="search" id="qInv" placeholder="ПОИСК..." aria-label="Поиск по инвентарю">
+              <select class="field" id="sInv" aria-label="Сортировка">
+                <option value="d">Сначала дорогие</option>
+                <option value="a">Сначала дешёвые</option>
+              </select>
+              <button class="btn" id="clrSel">[СНЯТЬ ВСЁ]</button>
+            </div>
+            <div class="scroll"><div class="grid" id="gInv"></div></div>
+          </div>
+
+          <div class="box">
+            <div class="bar">
+              <h3>// ВЫБЕРИТЕ ЦЕЛЬ</h3>
+              <input class="field" type="search" id="qTgt" placeholder="ПОИСК..." aria-label="Поиск цели">
+              <div class="mults" id="mults" aria-label="Подобрать цель по множителю">
+                <button type="button" data-x="1.5">×1.5</button>
+                <button type="button" data-x="2">×2</button>
+                <button type="button" data-x="3">×3</button>
+                <button type="button" data-x="5">×5</button>
+                <button type="button" data-x="10">×10</button>
+              </div>
+            </div>
+            <div class="scroll"><div class="grid" id="gTgt"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ВКЛАДКА 2: ЯЩИКИ -->
+      <section class="page" id="p-cases" hidden>
+        <div class="phead">
+          <div>
+            <h2>// АРХИВ ЯЩИКОВ</h2>
+            <p>В каждом ящике содержится учебный артефакт. Вероятности дропа зафиксированы протоколом.</p>
+          </div>
+        </div>
+        <div class="crates" id="gCases"></div>
+      </section>
+
+      <!-- ВКЛАДКА 3: МАГАЗИН -->
+      <section class="page" id="p-shop" hidden>
+        <div class="phead">
+          <div>
+            <h2>// ВОЕНТОРГ / КАНЦЕЛЯРИЯ</h2>
+            <p>Приобретайте учебный инвентарь за кредиты и используйте в качестве ставок апгрейда.</p>
+          </div>
+        </div>
+        <div class="box">
+          <div class="bar">
+            <h3 id="shopN"></h3>
+            <input class="field" type="search" id="qShop" placeholder="ПОИСК..." aria-label="Поиск">
+            <select class="field" id="fShop" aria-label="Полезность">
+              <option value="">Любая категория</option>
+            </select>
+            <select class="field" id="sShop" aria-label="Сортировка">
+              <option value="a">Сначала дешёвые</option>
+              <option value="d">Сначала дорогие</option>
+            </select>
+          </div>
+          <div class="grid" id="gShop"></div>
+        </div>
+      </section>
+
+      <!-- ВКЛАДКА 4: СТАТИСТИКА -->
+      <section class="page" id="p-profile" hidden>
+        <div class="phead">
+          <div>
+            <h2>// СИСТЕМНЫЙ ЖУРНАЛ И СТАТИСТИКА</h2>
+            <p>Телеметрия сессии, история открытий контейнеров и журнал транзакций.</p>
+          </div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="box">
+          <div class="bar"><h3>// ЖУРНАЛ ОПЕРАЦИЙ</h3></div>
+          <div class="tablewrap" id="hist"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Контейнеры модальных окон и тостов -->
+<div id="modal"></div>
+<div class="toast" id="toast" role="status"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('zachet.static', filename='js/data.js') }}"></script>
+<script src="{{ url_for('zachet.static', filename='js/skins.js') }}"></script>
+<script src="{{ url_for('zachet.static', filename='js/app.js') }}"></script>
+<script>
+  // Мгновенная синхронизация локального баланса апгрейдера с шапкой CyberOS
+  (function initBalSync() {
+    const balEl = document.getElementById('bal');
+    const headerBal = document.getElementById('header-balance');
+    if (balEl && headerBal) {
+      const obs = new MutationObserver(() => {
+        headerBal.textContent = balEl.textContent;
+      });
+      obs.observe(balEl, { childList: true, characterData: true, subtree: true });
+    }
+  })();
+</script>
+{% endblock %}

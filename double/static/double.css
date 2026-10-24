@@ -1,0 +1,303 @@
+/* ==========================================================================
+   СТИЛИ ДАБЛА (DOUBLE PROTOCOL) В ТЕРМИНАЛЬНОМ СТИЛЕ CYBEROS
+   ========================================================================== */
+
+:root {
+    --double-tile: 76px;
+    --c-red: #c92a2a;
+    --c-black: #1a1a1f;
+    --c-green: #2b8a3e;
+}
+
+/* Центрирование окна дабла в рабочей зоне */
+.double-page-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding-top: 10px;
+}
+
+.double-terminal-window {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.double-body {
+    padding: 24px !important;
+}
+
+#double {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   БЕГУЩАЯ ЛЕНТА
+   -------------------------------------------------------------------------- */
+.wheel {
+    position: relative;
+    margin: 10px 0 16px;
+}
+
+.viewport {
+    overflow: hidden;
+    background: #060200;
+    border: 2px solid var(--amber-solid);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.95);
+}
+
+.strip {
+    display: flex;
+    will-change: transform;
+}
+
+.strip.animating {
+    transition: transform 4s cubic-bezier(0.12, 0.7, 0.16, 1);
+}
+
+/* Плитка числа на ленте */
+.tile {
+    flex: 0 0 var(--double-tile);
+    height: var(--double-tile);
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: inherit;
+    border: 1px solid rgba(255, 157, 0, 0.25);
+    user-select: none;
+}
+
+/* Цвета секторов */
+.tile.red, .dot.red, .color-btn.red { background: var(--c-red); color: #fff; }
+.tile.black, .dot.black, .color-btn.black { background: var(--c-black); color: #ffb732; border: 1px solid rgba(255, 157, 0, 0.35); }
+.tile.green, .dot.green, .color-btn.green { background: var(--c-green); color: #fff; }
+
+/* Янтарный лазер-указатель по центру */
+.marker {
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    left: 50%;
+    width: 4px;
+    margin-left: -2px;
+    background: var(--amber-bright);
+    z-index: 5;
+    box-shadow: 0 0 14px var(--amber-solid), 0 0 4px #ffffff;
+    pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   СТАТУС И СООБЩЕНИЯ
+   -------------------------------------------------------------------------- */
+.message {
+    min-height: 28px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 12px 0 20px;
+    color: var(--amber-bright);
+}
+
+.message.win {
+    color: #ffd276;
+    text-shadow: 0 0 12px var(--amber-glow);
+}
+
+.message.lose {
+    color: #ff453a;
+    text-shadow: 0 0 10px rgba(255, 69, 58, 0.6);
+}
+
+.message.error {
+    color: var(--amber-solid);
+}
+
+/* --------------------------------------------------------------------------
+   ПАНЕЛЬ УПРАВЛЕНИЯ СТАВКАМИ
+   -------------------------------------------------------------------------- */
+.panel {
+    background: rgba(10, 4, 0, 0.85);
+    border: 1px solid rgba(255, 157, 0, 0.35);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Кнопки выбора цвета */
+.colors {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.color-btn {
+    border: 2px solid transparent;
+    padding: 14px 8px;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 800;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: all 0.16s ease;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+}
+
+.color-btn span {
+    display: block;
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.color-btn:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px rgba(255, 157, 0, 0.4);
+}
+
+.color-btn.selected {
+    opacity: 1;
+    border-color: var(--amber-bright);
+    box-shadow: 0 0 20px var(--amber-glow);
+    transform: translateY(-2px);
+}
+
+/* Поле ставки и быстрые кнопки */
+.amount-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.amount-row {
+    display: flex;
+    align-items: center;
+    background: #050201;
+    border: 1px solid var(--amber-solid);
+    padding: 6px 14px;
+}
+
+.amount-row label, .currency-tag {
+    color: var(--amber-solid);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+#amount {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--amber-bright);
+    font-family: inherit;
+    font-size: 1.25rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    outline: none;
+}
+
+.quick {
+    display: flex;
+    gap: 8px;
+}
+
+.quick button {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid rgba(255, 157, 0, 0.4);
+    background: rgba(255, 157, 0, 0.08);
+    color: var(--amber-bright);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.quick button:hover {
+    background: var(--amber-solid);
+    color: var(--text-black);
+    box-shadow: 0 0 10px var(--amber-glow);
+}
+
+/* Кнопка запуска рулетки */
+.spin-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--amber-solid);
+    color: var(--text-black);
+    border: 1px solid var(--amber-solid);
+    font-family: inherit;
+    font-size: 1.2rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 0 16px var(--amber-glow);
+    transition: all 0.16s ease;
+}
+
+.spin-btn:hover {
+    background: var(--amber-bright);
+    box-shadow: 0 0 24px var(--amber-glow);
+    transform: translateY(-2px);
+}
+
+.spin-btn:disabled {
+    background: rgba(255, 157, 0, 0.15);
+    color: rgba(255, 157, 0, 0.4);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.reset-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px dashed #ff453a;
+    color: #ff453a;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.reset-btn:hover {
+    background: #ff453a;
+    color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   ИСТОРИЯ ВЫПАДЕНИЙ
+   -------------------------------------------------------------------------- */
+.history {
+    margin-top: 20px;
+}
+
+.history-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--amber-solid);
+    margin-bottom: 8px;
+}
+
+.history-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+    user-select: none;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}

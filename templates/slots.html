@@ -1,0 +1,392 @@
+{% extends 'base.html' %}
+
+{% block title %}Слоты «НИКОЛА» — БУРМАЛДА{% endblock %}
+
+{% block head %}
+<!-- Библиотеки Three.js и загрузчик GLTF моделей -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<style>
+    /* 1. Центрирование и расширенная рамка терминального окна */
+    .slots-page-wrapper {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        padding-top: 10px;
+    }
+    .slots-terminal-window {
+        width: 100%;
+        max-width: 1580px;
+        margin: 0 auto;
+    }
+    .slots-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 20px;
+        text-align: center;
+        overflow: visible !important;
+    }
+
+    /* 2. Контейнер автомата и рычага */
+    .gambling-machine-box {
+        position: relative;
+        width: 100%;
+        max-width: 860px;
+        margin: 0 auto 24px auto;
+        user-select: none;
+        overflow: visible !important;
+    }
+
+    /* 3. Корпус автомата */
+    .machine-case-img {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        height: auto;
+        display: block;
+        pointer-events: none;
+    }
+
+    /* 4. 3D-рычаг: сохранены твои координаты */
+    .slot-lever-3d {
+        position: absolute;
+        left: -260px;
+        top: 15%;
+        width: 370px;
+        height: 480px;
+        z-index: 1;
+        cursor: pointer;
+        filter: drop-shadow(0 0 10px rgba(255, 157, 0, 0.45));
+        transition: filter 0.2s ease;
+    }
+
+    .slot-lever-3d:hover {
+        filter: drop-shadow(0 0 22px rgba(255, 183, 50, 0.9));
+    }
+
+    .lever-hint {
+        position: absolute;
+        top: -15px;
+        left: 38%;
+        transform: translateX(-50%);
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--amber-solid, #ff9d00);
+        letter-spacing: 1px;
+        white-space: nowrap;
+        pointer-events: none;
+        text-shadow: 0 0 8px rgba(255, 157, 0, 0.8);
+    }
+
+    /* Тряска автомата во время игры */
+    .gambling-machine-box.is-shaking {
+        animation: machineShake 0.08s infinite linear;
+    }
+
+    @keyframes machineShake {
+        0%   { transform: translate(0, 0); }
+        25%  { transform: translate(-3px, 2px); }
+        50%  { transform: translate(3px, -2px); }
+        75%  { transform: translate(-2px, -2px); }
+        100% { transform: translate(2px, 3px); }
+    }
+
+    /* 5. Барабаны слотов */
+    .reel {
+        position: absolute;
+        top: 38.5%;
+        height: 31%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(3rem, 5.2vw, 5.2rem);
+        background: radial-gradient(circle, #3d1613 25%, #220b0a 100%);
+        overflow: hidden;
+        border: 2px solid rgba(75, 24, 20, 0.85);
+        box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.95), inset 0 4px 10px rgba(0, 0, 0, 0.9);
+        z-index: 4;
+    }
+    .reel-slot-1 { left: 4.8%; width: 26.4%; }
+    .reel-slot-2 { left: 36.8%; width: 26.4%; }
+    .reel-slot-3 { left: 68.8%; width: 26.4%; }
+    .reel img { width: 82%; height: 82%; object-fit: contain; }
+
+    .spinning { animation: cleanSpin 0.1s infinite linear; }
+    @keyframes cleanSpin {
+        0% { filter: blur(2px); transform: translateY(-3px); }
+        100% { filter: blur(4px); transform: translateY(3px); }
+    }
+
+    /* 6. Центрированная панель ставки */
+    .slots-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin-top: 14px;
+    }
+
+    .slots-bet-group {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: #050201;
+        border: 2px solid var(--amber-solid, #ff9d00);
+        padding: 6px 16px;
+        color: var(--amber-bright, #ffb732);
+        box-shadow: 0 0 16px rgba(255, 157, 0, 0.25);
+        user-select: none;
+    }
+
+    .bet-label, .bet-currency {
+        color: var(--amber-solid, #ff9d00);
+        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+    /* Скрытие стандартных некрасивых стрелок браузера */
+    #bet-input::-webkit-outer-spin-button,
+    #bet-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    #bet-input {
+        -moz-appearance: textfield;
+        background: transparent;
+        border: none;
+        color: var(--amber-bright, #ffb732);
+        font-family: inherit;
+        font-size: 1.4rem;
+        font-weight: 800;
+        width: 85px;
+        text-align: center;
+        outline: none;
+    }
+
+    /* Кастомные терминальные кнопки регулировки ставки */
+    .bet-step-btn {
+        background: rgba(255, 157, 0, 0.1);
+        border: 1px solid var(--amber-solid, #ff9d00);
+        color: var(--amber-bright, #ffb732);
+        font-family: inherit;
+        font-size: 1.2rem;
+        font-weight: 800;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .bet-step-btn:hover {
+        background: var(--amber-solid, #ff9d00);
+        color: #050201;
+        box-shadow: 0 0 10px rgba(255, 157, 0, 0.8);
+    }
+
+    .bet-step-btn:active {
+        transform: scale(0.92);
+    }
+
+    .status-message {
+        margin-top: 18px;
+        font-size: 1.2rem;
+        min-height: 28px;
+        font-weight: 700;
+        text-align: center;
+    }
+    .status-message.win {
+        color: #ffd276;
+        text-shadow: 0 0 14px rgba(255, 157, 0, 0.55);
+    }
+    .status-message.lose {
+        color: #ff453a;
+        text-shadow: 0 0 10px rgba(255, 69, 58, 0.6);
+    }
+    .casino-slogan {
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: rgba(255, 157, 0, 0.45);
+        letter-spacing: 1px;
+        text-align: center;
+        user-select: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="slots-page-wrapper">
+    <div class="terminal-window slots-terminal-window">
+        <div class="terminal-window-header">
+            <span class="window-title-text">СЛОТ-МОДУЛЬ // «НИКОЛА» V1.0.8</span>
+            <div class="window-controls">
+                <span class="win-btn">_</span>
+                <span class="win-btn">□</span>
+                <span class="win-btn win-close">×</span>
+            </div>
+        </div>
+
+        <div class="terminal-window-body slots-body">
+            <div class="gambling-machine-box">
+                <!-- 3D рычаг -->
+                <div id="lever-container" class="slot-lever-3d" title="Потяни рычаг!">
+                    <span class="lever-hint">[ТЯНИ]</span>
+                </div>
+
+                <!-- Корпус автомата -->
+                <img class="machine-case-img" src="{{ url_for('static', filename='images/gambling_machine.png') }}" alt="Slot Machine">
+
+                <!-- Барабаны -->
+                <div id="reel1" class="reel reel-slot-1">🍒</div>
+                <div id="reel2" class="reel reel-slot-2">🍋</div>
+                <div id="reel3" class="reel reel-slot-3">🍉</div>
+            </div>
+
+            <!-- Центрированное управление ставкой без кнопки крутить -->
+            <div class="slots-controls">
+                <div class="slots-bet-group">
+                    <span class="bet-label">[СТАВКА:</span>
+                    <button type="button" class="bet-step-btn" onclick="changeBet(-10)">−</button>
+                    <input type="number" id="bet-input" value="100" min="10" step="10">
+                    <button type="button" class="bet-step-btn" onclick="changeBet(10)">+</button>
+                    <span class="bet-currency">🪙]</span>
+                </div>
+
+                <!-- Скрытая кнопка для совместимости со slots.js -->
+                <button id="spin-btn" style="display: none;"></button>
+            </div>
+
+            <div id="status" class="status-message"></div>
+            <span id="balance-display" style="display: none;"></span>
+
+            <div class="casino-slogan">// ДЕПАЙ КВАРТИРУ — ВЫБИВАЙ НИКОЛОВ</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='slots.js') }}"></script>
+<script>
+    // Регулировка ставки кнопками [+] и [-]
+    function changeBet(step) {
+        const inp = document.getElementById('bet-input');
+        if (!inp) return;
+        let current = parseInt(inp.value) || 0;
+        let min = parseInt(inp.min) || 10;
+        let updated = current + step;
+        if (updated < min) updated = min;
+        inp.value = updated;
+    }
+
+    // 1. Синхронизация баланса с шапкой сайта
+    const hiddenBal = document.getElementById('balance-display');
+    const headerBal = document.getElementById('header-balance');
+    if (hiddenBal && headerBal) {
+        hiddenBal.innerText = headerBal.innerText;
+        const obs = new MutationObserver(() => { headerBal.innerText = hiddenBal.innerText; });
+        obs.observe(hiddenBal, { childList: true, characterData: true, subtree: true });
+    }
+
+    // 2. Тряска корпуса при вращении барабанов
+    const machineBox = document.querySelector('.gambling-machine-box');
+    const reelSample = document.getElementById('reel1');
+    if (machineBox && reelSample) {
+        const shakeObserver = new MutationObserver(() => {
+            if (reelSample.classList.contains('spinning')) {
+                machineBox.classList.add('is-shaking');
+            } else {
+                machineBox.classList.remove('is-shaking');
+            }
+        });
+        shakeObserver.observe(reelSample, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // 3. Инициализация 3D-рычага с увеличенным полем обзора
+    (function initLever3D() {
+        const container = document.getElementById('lever-container');
+        if (!container) return;
+
+        const scene = new THREE.Scene();
+        const width = 370;
+        const height = 480;
+
+        const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 1.8));
+        const dirLight = new THREE.DirectionalLight(0xffeedd, 2.0);
+        dirLight.position.set(-3, 5, 4);
+        scene.add(dirLight);
+
+        let mixer = null;
+        let leverAction = null;
+
+        const loader = new THREE.GLTFLoader();
+        loader.load("{{ url_for('static', filename='models/lever.glb') }}", function(gltf) {
+            const model = gltf.scene;
+
+            // Твой выставленный угол
+            model.rotation.y = THREE.MathUtils.degToRad(-100);
+            model.updateMatrixWorld(true);
+
+            // Центрирование
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+
+            model.position.x = -center.x;
+            model.position.y = -center.y;
+            model.position.z = -center.z;
+
+            scene.add(model);
+
+            // Корректная позиция камеры без обрыва синтаксиса
+            const maxDim = Math.max(size.x, size.y, size.z);
+            camera.position.set(0, 0, maxDim * 1.8);
+            camera.lookAt(0, 0, 0);
+
+            if (gltf.animations && gltf.animations.length > 0) {
+                mixer = new THREE.AnimationMixer(model);
+                const clip = gltf.animations.find(a => a.name === 'CircleAction') || gltf.animations[0];
+                leverAction = mixer.clipAction(clip);
+                leverAction.setLoop(THREE.LoopOnce);
+                leverAction.clampWhenFinished = false;
+            }
+        });
+
+        const clock = new THREE.Clock();
+        function renderLoop() {
+            requestAnimationFrame(renderLoop);
+            const delta = clock.getDelta();
+            if (mixer) mixer.update(delta);
+            renderer.render(scene, camera);
+        }
+        renderLoop();
+
+        window.pullLever = function() {
+            if (leverAction) {
+                leverAction.reset();
+                leverAction.play();
+            }
+        };
+
+        container.addEventListener('click', () => {
+            const spinBtn = document.getElementById('spin-btn');
+            if (spinBtn && spinBtn.disabled) return;
+            window.pullLever();
+            playSlots();
+        });
+    })();
+</script>
+{% endblock %}

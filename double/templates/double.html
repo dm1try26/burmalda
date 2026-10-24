@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Double // Рулетка x2 / x14 — БУРМАЛДА{% endblock %}
+
+{% block head %}
+<!-- Стили Дабла с сохранением ленты и рулетки -->
+<link rel="stylesheet" href="{{ url_for('double.static', filename='double.css') }}?v=1">
+{% endblock %}
+
+{% block body %}
+<div class="double-page-wrapper">
+    <!-- Главное окно терминала для игры Double -->
+    <div class="terminal-window double-terminal-window">
+        <!-- Шапка окна в едином стиле -->
+        <div class="terminal-window-header">
+            <span class="window-title-text">РУЛЕТКА // DOUBLE PROTOCOL [X2 / X14]</span>
+            <div class="window-controls">
+                <span class="win-btn">_</span>
+                <span class="win-btn">□</span>
+                <span class="win-btn win-close">×</span>
+            </div>
+        </div>
+
+        <div class="terminal-window-body double-body">
+            <!-- Корневой контейнер с данными для double.js -->
+            <div id="double"
+                 data-spin-url="{{ url_for('double.api_spin') }}"
+                 data-reset-url="{{ url_for('double.api_reset') }}"
+                 data-slot-colors='{{ slot_colors|tojson }}'
+                 data-payouts='{{ payouts|tojson }}'
+                 data-history='{{ history|tojson }}'
+                 data-balance="{{ balance }}"
+                 data-min-bet="{{ min_bet }}"
+                 data-max-bet="{{ max_bet }}">
+
+                <!-- Скрытый элемент для совместимости с JS (баланс уже есть в шапке) -->
+                <span id="balance" style="display: none;">{{ balance }}</span>
+
+                <!-- Бегущая лента чисел -->
+                <section class="wheel">
+                    <div class="marker"></div>
+                    <div class="viewport">
+                        <div class="strip" id="strip"></div>
+                    </div>
+                </section>
+
+                <!-- Статусная строка терминала -->
+                <div class="message" id="message">// ВЫБЕРИТЕ СЕКТОР И УКАЖИТЕ РАЗМЕР СТАВКИ</div>
+
+                <!-- Панель ставок и выбора цвета -->
+                <section class="panel">
+                    <div class="colors" id="colors">
+                        <button type="button" class="color-btn red" data-color="red">
+                            КРАСНОЕ <span>[X{{ payouts.red }}]</span>
+                        </button>
+                        <button type="button" class="color-btn green" data-color="green">
+                            ЗЕЛЁНОЕ <span>[X{{ payouts.green }}]</span>
+                        </button>
+                        <button type="button" class="color-btn black" data-color="black">
+                            ЧЁРНОЕ <span>[X{{ payouts.black }}]</span>
+                        </button>
+                    </div>
+
+                    <div class="amount-box">
+                        <div class="amount-row">
+                            <label for="amount">[СТАВКА:</label>
+                            <input id="amount" type="number" min="{{ min_bet }}" max="{{ max_bet }}" step="1" value="10">
+                            <span class="currency-tag">🪙]</span>
+                        </div>
+                        <div class="quick">
+                            <button type="button" data-action="min">[МИН]</button>
+                            <button type="button" data-action="half">[½]</button>
+                            <button type="button" data-action="double">[X2]</button>
+                            <button type="button" data-action="max">[МАКС]</button>
+                        </div>
+                    </div>
+
+                    <button type="button" id="spin" class="spin-btn">[ КРУТИТЬ РУЛЕТКУ ]</button>
+                    <button type="button" id="reset" class="reset-btn" hidden>[ НАЧАТЬ ЗАНОВО: 1000 🪙 ]</button>
+                </section>
+
+                <!-- История последних раундов -->
+                <section class="history">
+                    <div class="history-title">// ИСТОРИЯ ВЫПАДЕНИЙ:</div>
+                    <div id="history" class="history-list"></div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('double.static', filename='double.js') }}"></script>
+{% endblock %}
