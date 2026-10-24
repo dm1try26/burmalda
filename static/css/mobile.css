@@ -1,0 +1,723 @@
+/* Кнопка-бургер и затемнение по умолчанию скрыты (на десктопе их нет) */
+.burger,
+.sidebar-backdrop {
+    display: none;
+}
+
+@media (max-width: 900px) {
+
+    /* Нельзя прокручивать страницу под открытым меню */
+    body.menu-open {
+        overflow: hidden;
+    }
+
+    /* Сайдбар выезжает поверх контента слева */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        height: 100dvh;                    /* учитывает адресную строку мобильного браузера */
+        width: min(82vw, 300px);
+        min-width: 0;
+        padding: 22px 20px;
+        overflow-y: auto;
+        transform: translateX(-105%);
+        transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+        z-index: 1000;
+        visibility: hidden;                /* закрытое меню недоступно для Tab и скринридеров */
+    }
+    .sidebar.is-open {
+        transform: translateX(0);
+        visibility: visible;
+        box-shadow: 0 0 40px rgba(255, 157, 0, 0.35);
+    }
+
+    /* Затемнение остальной страницы */
+    .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease-out;
+        z-index: 999;
+    }
+    .sidebar-backdrop.is-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Пункты меню: крупнее для пальца, без сдвига при наведении */
+    .sidebar-nav {
+        gap: 4px;
+    }
+    a.sidebar-link,
+    .sidebar-link {
+        padding: 12px 0;
+        font-size: 1.1rem;
+    }
+    a.sidebar-link:hover,
+    .sidebar-link:hover {
+        transform: none;
+    }
+    .sidebar-logo {
+        padding-bottom: 16px;
+        margin-bottom: 14px;
+    }
+
+    /* Шапка: бургер слева, баланс справа, прилипает к верху экрана */
+    .top-bar {
+        position: sticky;
+        top: 0;
+        z-index: 90;
+        justify-content: space-between;
+        padding: 10px 14px;
+        margin-bottom: 18px;
+        background-color: var(--bg-dark);
+        border-bottom: 2px solid rgba(255, 157, 0, 0.35);
+    }
+    .balance-corner {
+        font-size: 1.1rem;
+        min-width: 0;
+    }
+
+    /* Кнопка-бургер: три полоски, превращаются в крестик при открытом меню */
+    .burger {
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        width: 44px;                       /* минимальная удобная область нажатия */
+        height: 44px;
+        padding: 0 10px;
+        background: transparent;
+        border: 1px solid var(--amber-solid);
+        border-radius: 0;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .burger span {
+        display: block;
+        height: 2px;
+        width: 100%;
+        background: var(--amber-solid);
+        box-shadow: 0 0 8px var(--amber-glow);
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .burger:focus-visible {
+        outline: 2px solid var(--amber-bright);
+        outline-offset: 2px;
+    }
+
+    .page-content {
+        padding: 0 16px 32px 16px;
+    }
+}
+
+/* На устройствах без мыши эффект «сдвиг при наведении» не нужен (залипает после тапа) */
+@media (hover: none) {
+    a.sidebar-link:hover,
+    .sidebar-link:hover {
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   2. ТЕЛЕФОНЫ (до 600px): общие компоненты
+   ========================================================================== */
+@media (max-width: 600px) {
+
+    .page-content {
+        padding: 0 10px 28px 10px;
+    }
+
+    /* Терминальные окна: длинный заголовок переносится, кнопки-декорации прячем */
+    .terminal-window-header {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+        gap: 8px;
+    }
+    .terminal-window-header .window-title-text {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+    .window-controls {
+        display: none !important;          /* в main.css стоит !important, поэтому и здесь */
+    }
+
+    /* Главная: все сетки в одну колонку */
+    .dashboard-container,
+    .dashboard-canvas,
+    .canvas-right-lower {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+    }
+    .canvas-left-zone,
+    .canvas-right-zone {
+        gap: 24px;
+    }
+    .canvas-right-zone {
+        padding-top: 0;
+    }
+    .canvas-right-stack {
+        margin-top: 0;
+    }
+
+    /* Главная: фиксированные «десктопные» высоты окон на телефоне только растягивают страницу */
+    .window-hero,
+    .window-wide-log,
+    .window-tall-leaderboard,
+    .window-sub-bottom {
+        min-height: 0;
+    }
+    .window-sub-top {
+        min-height: 260px;                 /* окно с гифкой: нужна высота, чтобы кот не обрезался */
+    }
+    .window-wide-log {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* ASCII-логотип сам подгоняется под ширину окна (cqw в main.css), уменьшаем только отступы */
+    .hero-ascii-body {
+        padding: 12px 8px !important;
+    }
+
+    /* Формы входа и регистрации */
+    input.form-control,
+    .form-control {
+        font-size: 16px;                   /* iOS не увеличивает страницу при фокусе на поле */
+        max-width: 100%;
+    }
+}
+
+/* ==========================================================================
+   3. СТРАНИЦЫ ИГР
+   ========================================================================== */
+@media (max-width: 600px) {
+
+    /* --- Ракетка: см. отдельный раздел 5 ниже --- */
+
+    /* --- Слоты --- */
+    .slots-body {
+        padding: 16px 10px !important;
+    }
+    .slots-bet-group {
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 100%;
+    }
+
+    /* --- Double --- */
+    :root {
+        --double-tile: 56px;               /* плитки на ленте чуть меньше */
+    }
+    .double-body {
+        padding: 14px 12px !important;
+    }
+    .colors {
+        gap: 8px;
+    }
+
+    /* --- Ворона КОМБАТ --- */
+    .crow img {
+        width: min(320px, 78vw) !important;
+    }
+    .crow-zone {
+        margin-top: 16px !important;
+    }
+    h1 {
+        font-size: 1.4rem;
+        overflow-wrap: anywhere;
+    }
+}
+
+/* ==========================================================================
+   4. АПГРЕЙДЕР (zachet): компактная мобильная раскладка
+   Всё внутри media-запросов — на ПК ничего не меняется.
+   ========================================================================== */
+@media (max-width: 900px) {
+    /* Ставка и цель — рядом (две компактные карточки), циферблат с кнопкой — ниже на всю ширину */
+    .bench {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .bench > .col {
+        border: 0;
+    }
+    .stakecol { order: 1; border-right: 1px solid var(--line) !important; }
+    .tgtcol   { order: 2; }
+    .dial     { order: 3; grid-column: 1 / -1; border-top: 1px solid var(--line) !important; }
+
+    .lists {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    #bench {
+        scroll-margin-top: 72px;           /* чтобы липкая шапка не закрывала верх при прокрутке к цели */
+    }
+}
+
+@media (max-width: 700px) {
+    /* Шапка окна: кнопка звука уходит в правый верхний угол, вкладки — сеткой 2×2 */
+    .zachet-win-header {
+        position: relative;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .zachet-header-left {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .zachet-win-header .window-title-text {
+        padding-right: 40px;
+    }
+    .zachet-header-right {
+        position: absolute;
+        top: 4px;
+        right: 8px;
+        width: auto;
+    }
+    /* Баланс уже виден в липкой шапке сайта (оба обновляются вместе), второй такой же не нужен */
+    .wallet {
+        display: none;
+    }
+    .mute-btn {
+        width: 32px;
+        height: 32px;
+    }
+    .tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        width: 100%;
+    }
+    .tabs button {
+        padding: 10px 4px;
+        font-size: 11px;
+        min-height: 40px;
+        border-color: rgba(10, 4, 0, 0.45);
+    }
+}
+
+@media (max-width: 600px) {
+    .zachet-page-wrapper { gap: 10px; }
+    .zachet-body { padding: 10px !important; }
+
+    /* Лента выпадений: вместо длинной подписи — один маркер, чтобы лента занимала всю ширину */
+    .feed-terminal-bar { height: 44px; }
+    .feed-label-tag {
+        font-size: 0;
+        gap: 0;
+        padding: 0 12px;
+    }
+    .chip {
+        width: 124px;
+        padding: 0 8px;
+        gap: 6px;
+    }
+    .chip svg { width: 40px; height: 22px; }
+    @keyframes slide { from { margin-left: -124px; } }
+
+    /* Подписи без стилей по умолчанию были 16px и ломали сетку */
+    .lbl {
+        font-size: 11px;
+        letter-spacing: 0.02em;
+    }
+
+    /* --- Рабочая зона --- */
+    .col {
+        padding: 12px;
+        gap: 10px;
+    }
+    .col .hd {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    #untgt {
+        background: transparent;
+        border: 0;
+        padding: 0;
+        color: var(--accent);
+        cursor: pointer;
+    }
+    .col .val {
+        font-size: 28px;
+    }
+    .col .val small {
+        font-size: 12px;
+        margin-left: 4px;
+    }
+    .stake {
+        grid-template-columns: minmax(0, 1fr);
+        max-height: 210px;
+    }
+    .stake .slot .art {
+        height: 34px;
+    }
+    .stake .slot .art svg {
+        height: 30px;
+    }
+    .note {
+        padding: 14px 6px;
+        font-size: 11px;
+    }
+
+    /* Добавление кредитов: поле на всю строку, три кнопки в ряд под ним */
+    .coins {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .coins label {
+        font-size: 10px;
+        line-height: 1.3;
+        padding-bottom: 4px;
+    }
+    .coins input {
+        grid-column: 1 / -1;
+        min-width: 0;
+        width: 100%;
+        font-size: 16px;                   /* iOS не приближает страницу при фокусе */
+    }
+    .coins button {
+        padding: 10px 0;
+        min-height: 40px;
+    }
+
+    /* Цель */
+    .target {
+        min-height: 0;
+        justify-content: flex-start;
+    }
+    .target .pic {
+        padding: 8px 0 12px;
+    }
+    .target .pic svg {
+        width: 100%;
+        max-width: 150px;
+    }
+    .target .meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding-top: 10px;
+    }
+    .target .meta h3 {
+        font-size: 17px;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+    }
+    .target .meta .pr {
+        font-size: 15px;
+    }
+
+    /* Циферблат */
+    .dial {
+        padding: 14px 12px;
+        gap: 10px;
+    }
+    .face {
+        max-width: min(280px, 76vw);
+    }
+    .readout b {
+        font-size: clamp(26px, 9vw, 36px);
+    }
+    .specs div {
+        padding: 6px 2px;
+    }
+    .specs .lbl {
+        font-size: 10px;
+    }
+    .specs b {
+        font-size: 13px;
+    }
+    .run-btn {
+        font-size: 15px;
+        letter-spacing: 0;
+        padding: 14px 8px;
+        min-height: 52px;
+        touch-action: manipulation;
+    }
+    .run-btn:hover:not(:disabled) {
+        transform: none;
+    }
+    .why {
+        font-size: 11px;
+    }
+
+    /* --- Списки предметов --- */
+    .lists { gap: 10px; margin-top: 10px; }
+    .bar {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+    .bar h3 {
+        width: 100%;
+        margin-right: 0;
+        font-size: 13px;
+    }
+    .field {
+        flex: 1 1 120px;
+        min-width: 0;
+        font-size: 16px;                   /* против автозума iOS */
+        padding: 8px 10px;
+    }
+    .field[type="search"] {
+        flex-basis: 100%;                  /* поиск на всю строку, фильтры и кнопки — под ним */
+    }
+    select.field {
+        flex: 1 1 0;
+        text-overflow: ellipsis;
+    }
+    .btn {
+        padding: 9px 10px;
+        min-height: 38px;
+    }
+    .mults {
+        width: 100%;
+    }
+    .mults button {
+        flex: 1;
+        padding: 10px 0;
+    }
+    .scroll {
+        max-height: min(55vh, 440px);
+        -webkit-overflow-scrolling: touch;
+    }
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    }
+    .slot {
+        padding: 8px;
+    }
+    .slot .art {
+        height: 56px;
+    }
+    .slot .art svg {
+        height: 48px;
+    }
+    .slot .nm {
+        font-size: 12px;
+    }
+
+    /* --- Вкладки «Ящики», «Магазин», «Статистика» --- */
+    .phead h2 { font-size: 17px; }
+    .phead p  { font-size: 12px; }
+    .crates {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .crate { padding: 10px; }
+    .crate svg { height: 84px; margin-bottom: 4px; }
+    .crate h3 { font-size: 16px; }
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .stats b { font-size: 18px; }
+    .tablewrap {
+        overflow-x: auto;                  /* журнал не вылезает за экран, а прокручивается */
+        -webkit-overflow-scrolling: touch;
+    }
+    .log { min-width: 460px; }
+
+    /* --- Модальные окна и результат апгрейда --- */
+    .shade {
+        padding: 10px;
+    }
+    .win-box {
+        max-height: calc(100dvh - 20px);
+        overflow-y: auto;
+    }
+    .win-box .top {
+        padding: 8px 12px;
+    }
+    .win-box .top h2 {
+        font-size: 14px;
+    }
+    .win-box .body {
+        padding: 12px;
+    }
+    .result {
+        grid-template-columns: minmax(0, 1fr) !important;
+        min-height: 0 !important;
+    }
+    .result .pic {
+        padding: 14px 10px !important;
+        border-right: none !important;
+    }
+    .result .pic svg {
+        max-width: 200px !important;
+    }
+    .result .info {
+        padding: 14px !important;
+    }
+    .result .info h3 {
+        font-size: 22px;
+        overflow-wrap: anywhere;
+    }
+    .result .actions {
+        flex-wrap: wrap !important;
+    }
+    .result .actions .btn {
+        flex: 1 1 auto;
+    }
+    .toast {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        text-align: center;
+    }
+}
+
+/* ==========================================================================
+   5. РАКЕТКА: всё помещается на экран, кнопки под рукой
+   Компактная раскладка включается на узких экранах и на телефонах в альбомной ориентации
+   (только сенсорные устройства, так что узкое окно ПК-браузера по высоте не затрагивается).
+   ========================================================================== */
+@media (max-width: 680px),
+       (max-height: 520px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+    .rocket-page-wrapper {
+        padding-top: 0;
+    }
+    /* overflow: visible нужен, чтобы нижняя панель кнопок могла «прилипать» к низу экрана */
+    .rocket-terminal-window {
+        overflow: visible;
+    }
+    .rocket-body {
+        padding: 10px !important;
+        gap: 10px;
+    }
+
+    /* История коэффициентов */
+    .rocket-history {
+        gap: 6px;
+        padding-bottom: 0;
+    }
+    .rocket-chip {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+    }
+
+    /* Сцена: ниже, чтобы поле ставки и кнопки были видны без прокрутки */
+    .rocket-stage {
+        height: clamp(210px, 40vh, 340px);
+        height: clamp(210px, 40dvh, 340px);
+        border-width: 1px;
+    }
+    #mult {
+        font-size: clamp(40px, 14vw, 64px);
+        transform: translateY(-12px);
+    }
+    #status {
+        max-width: 92%;
+        padding: 4px 10px;
+        font-size: 0.72rem;
+        line-height: 1.35;
+        text-align: center;
+    }
+
+    /* Панель ставок: «Ставка» и «Автовывод» в две колонки */
+    .rocket-panel {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 10px;
+        padding: 10px !important;
+    }
+    .field-box {
+        gap: 6px;
+        min-width: 0;
+    }
+    .field-label {
+        font-size: 0.72rem;
+        letter-spacing: 0;
+    }
+    .input-row {
+        padding: 4px 8px;
+    }
+    .input-row input {
+        min-width: 0;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    .input-row .suffix {
+        font-size: 0.85rem;
+    }
+    .quick-row {
+        gap: 4px;
+    }
+    .quick-row button {
+        min-height: 38px;
+        padding: 6px 0;
+        font-size: 0.75rem;
+        touch-action: manipulation;
+    }
+    .toggle-row {
+        align-items: center;
+        gap: 8px;
+        margin-top: 0;
+        min-height: 38px;
+        font-size: 0.78rem;
+    }
+    .toggle-row input {
+        width: 22px;
+        height: 22px;
+        flex: none;
+    }
+    .toggle-long {
+        display: none;                     /* «АКТИВИРОВАТЬ» не влезает; остаётся «АВТОВЫВОД» */
+    }
+
+    /* Кнопки: рядом, крупные, прилипают к низу экрана, пока идёт полёт */
+    .action-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        margin: 2px -10px -10px;
+        padding: 8px 10px;
+        background: rgba(10, 4, 0, 0.97);
+        border-top: 1px solid rgba(255, 157, 0, 0.35);
+    }
+    .action-btn {
+        min-height: 56px;
+        padding: 8px 4px;
+        font-size: clamp(0.6rem, 3vw, 0.78rem);   /* подпись кнопки целиком в одну строку даже на узком экране */
+        letter-spacing: 0;
+        line-height: 1.2;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    #betBtn:hover:not(:disabled),
+    #cashBtn:not(:disabled) {
+        transform: none;
+    }
+    .panel-hint {
+        display: none;
+    }
+}
+
+/* Телефон в альбомной ориентации: сцена слева, ставки и кнопки справа — всё видно без прокрутки */
+@media (max-height: 520px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+    .rocket-terminal-window .terminal-window-header {
+        display: none;
+    }
+    .rocket-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+        gap: 8px 10px;
+        align-items: start;
+    }
+    .rocket-history {
+        grid-column: 1 / -1;
+    }
+    .rocket-stage {
+        height: clamp(150px, 62vh, 260px);
+        height: clamp(150px, 62dvh, 260px);
+    }
+    #mult {
+        font-size: clamp(34px, 11vh, 56px);
+    }
+}

@@ -324,7 +324,7 @@
                 <div class="field-box">
                     <span class="field-label">[СТАВКА]:</span>
                     <div class="input-row">
-                        <input type="number" id="bet" min="1" value="10" step="1">
+                        <input type="number" id="bet" min="1" value="10" step="1" inputmode="numeric">
                         <span class="suffix">🪙</span>
                     </div>
                     <div class="quick-row">
@@ -337,11 +337,11 @@
                 <div class="field-box">
                     <span class="field-label">[АВТОВЫВОД]:</span>
                     <div class="input-row">
-                        <input type="number" id="auto" min="1.01" step="0.01" value="2.00">
+                        <input type="number" id="auto" min="1.01" step="0.01" value="2.00" inputmode="decimal">
                         <span class="suffix">X</span>
                     </div>
                     <label class="toggle-row">
-                        <input type="checkbox" id="autoOn"> АКТИВИРОВАТЬ АВТОВЫВОД
+                        <input type="checkbox" id="autoOn"> <span class="toggle-long">АКТИВИРОВАТЬ&nbsp;</span>АВТОВЫВОД
                     </label>
                 </div>
 
@@ -382,7 +382,7 @@
   let lastFrame = performance.now();
   let flash = 0;
 
-  const ROCKET_SCALE = 1.15;
+  let ROCKET_SCALE = 1.15;            // на узкой сцене (телефон) ракета меньше, см. resize()
   const START_ANGLE = 15 * Math.PI / 180;
 
   function resize() {
@@ -390,6 +390,7 @@
     canvas.width = r.width * window.devicePixelRatio;
     canvas.height = r.height * window.devicePixelRatio;
     ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    ROCKET_SCALE = r.width < 600 ? 0.85 : 1.15;
   }
   window.addEventListener('resize', resize);
   resize();
@@ -576,7 +577,7 @@
     }
 
     // Траектория Безье
-    const X = w * 0.42, Yh = h * 0.8;
+    const X = w * (w < 600 ? 0.6 : 0.42), Yh = h * 0.8;   // на телефоне траектория шире
     const P1x = 0.4 * X, P1y = 0.4 * X * Math.tan(START_ANGLE);
     const P2x = 0.9 * X, P2y = 0.45 * Yh;
     const P3x = X,       P3y = Yh;
