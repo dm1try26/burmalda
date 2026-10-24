@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная — БУРМАЛДА{% endblock %}
+
+{% block body %}
+<!-- Хаотичная асимметричная сетка терминальных окон по эскизу -->
+<div class="dashboard-canvas">
+
+    <!-- Левая секция: увеличенное главное окно и широкий системный журнал под ним -->
+    <div class="canvas-left-zone">
+
+        <!-- Окно 1: Главный баннер только с ASCII-логотипом во всю величину -->
+        <div class="terminal-window window-hero">
+            <div class="terminal-window-header">
+                <span class="window-title-text">У тебя большая елда? Играй на сайте БУРМАЛДА</span>
+                <div class="window-controls">
+                    <span class="win-btn">_</span>
+                    <span class="win-btn">□</span>
+                    <span class="win-btn win-close">×</span>
+                </div>
+            </div>
+            <div class="terminal-window-body hero-ascii-body">
+                <pre class="terminal-ascii-art">
+ ________  ___  ___  ________  _____ ______   ________  ___       ________  ________
+|\   __  \|\  \|\  \|\   __  \|\   _ \  _   \|\   __  \|\  \     |\   ___ \|\   __  \
+\ \  \|\ /\ \  \\\  \ \  \|\  \ \  \\\__\ \  \ \  \|\  \ \  \    \ \  \_|\ \ \  \|\  \
+ \ \   __  \ \  \\\  \ \   _  _\ \  \\|__| \  \ \   __  \ \  \    \ \  \ \\ \ \   __  \
+  \ \  \|\  \ \  \\\  \ \  \\  \\ \  \    \ \  \ \  \ \  \ \  \____\ \  \_\\ \ \  \ \  \
+   \ \_______\ \_______\ \__\\ _\\ \__\    \ \__\ \__\ \__\ \_______\ \_______\ \__\ \__\
+    \|_______|\|_______|\|__|\|__|\|__|     \|__|\|__|\|__|\|_______|\|_______|\|__|\|__|
+                </pre>
+            </div>
+        </div>
+
+        <!-- Окно 2: Широкий горизонтальный блок логов под главным окном -->
+        <div class="terminal-window window-wide-log">
+            <div class="terminal-window-header">
+                <span class="window-title-text">SYS_FEED // ЖУРНАЛ СТАВОК И СОБЫТИЙ СЕТИ</span>
+                <div class="window-controls">
+                    <span class="win-btn">_</span>
+                    <span class="win-btn">□</span>
+                    <span class="win-btn win-close">×</span>
+                </div>
+            </div>
+            <div class="terminal-window-body">
+                <div class="terminal-feed-list">
+                    <div class="feed-row"><span class="feed-time">21:57:04</span> <span class="feed-user">nikol_clown</span> выиграл <span class="feed-gold">14,200 🪙</span> в Ракетка (x2.84)</div>
+                    <div class="feed-row"><span class="feed-time">21:56:49</span> <span class="feed-user">JEF_EP</span> выполнил клик <span class="feed-gold">+1,000 🪙</span> в Ворона КОМБАТ</div>
+                    <div class="feed-row"><span class="feed-time">21:56:12</span> <span class="feed-user">burmalda_pro</span> сорвал джекпот <span class="feed-gold">100,000 🪙</span> в Слоты [🔥🔥🔥]</div>
+                    <div class="feed-row"><span class="feed-time">21:55:38</span> <span class="feed-user">sergay</span> Сделал неудачный апгрейд, потерял машину</div>
+                    <div class="feed-row"><span class="feed-time">21:55:01</span> <span class="feed-user">Den4ik</span> потерял <span class="feed-gold">28,000 🪙</span> на красном в Double</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Правая секция: верхнее окно, под которым стоят высокое окно и стопка из двух малых -->
+    <div class="canvas-right-zone">
+
+        <!-- Окно 3: Верхний правый блок быстрого доступа к играм -->
+        <div class="terminal-window window-top-right">
+            <div class="terminal-window-header">
+                <span class="window-title-text">БЫСТРЫЙ ДОСТУП // МОДУЛИ</span>
+                <div class="window-controls">
+                    <span class="win-btn">_</span>
+                    <span class="win-btn">□</span>
+                    <span class="win-btn win-close">×</span>
+                </div>
+            </div>
+            <div class="terminal-window-body">
+                <div class="quick-nav-list">
+                    <a href="{{ url_for('rocket') }}" class="quick-nav-item">
+                        <span class="quick-nav-name">> РАКЕТКА</span>
+                        <span class="quick-nav-badge">[CRASH X100]</span>
+                    </a>
+                    <a href="{{ url_for('slots') }}" class="quick-nav-item">
+                        <span class="quick-nav-name">> СЛОТЫ «НИКОЛА»</span>
+                        <span class="quick-nav-badge">[JACKPOT]</span>
+                    </a>
+                    <a href="{{ url_for('zachet.index') }}" class="quick-nav-item">
+                        <span class="quick-nav-name">> АПГРЕЙДЕР «ЗАЧЁТ»</span>
+                        <span class="quick-nav-badge">[UPGRADE]</span>
+                    </a>
+                    <a href="{{ url_for('double.index') }}" class="quick-nav-item">
+                        <span class="quick-nav-name">> DOUBLE РУЛЕТКА</span>
+                        <span class="quick-nav-badge">[X2 / X14]</span>
+                    </a>
+                    <a href="{{ url_for('vorona_combat') }}" class="quick-nav-item">
+                        <span class="quick-nav-name">> ВОРОНА КОМБАТ</span>
+                        <span class="quick-nav-badge">[TAP-ZONE]</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижняя асимметричная пара: высокое окно слева и два малых окна справа -->
+        <div class="canvas-right-lower">
+
+            <!-- Окно 4: Высокий вертикальный лидерборд -->
+            <div class="terminal-window window-tall-leaderboard">
+                <div class="terminal-window-header">
+                    <span class="window-title-text">ТОП ИГРОКОВ</span>
+                    <div class="window-controls">
+                        <span class="win-btn">_</span>
+                        <span class="win-btn">□</span>
+                        <span class="win-btn win-close">×</span>
+                    </div>
+                </div>
+                <div class="terminal-window-body">
+                    <div class="leaderboard-list">
+                        <div class="leader-item"><span class="leader-rank">#1</span> <span class="leader-name">Melstroy</span> <span class="leader-val">984k 🪙</span></div>
+                        <div class="leader-item"><span class="leader-rank">#2</span> <span class="leader-name">suglick</span> <span class="leader-val">421k 🪙</span></div>
+                        <div class="leader-item"><span class="leader-rank">#3</span> <span class="leader-name">Valeria_oy_best_kyrator</span> <span class="leader-val">312k 🪙</span></div>
+                        <div class="leader-item"><span class="leader-rank">#4</span> <span class="leader-name">nikol_boss</span> <span class="leader-val">198k 🪙</span></div>
+                        <div class="leader-item"><span class="leader-rank">#5</span> <span class="leader-name">Shaposhnikov_<3</span> <span class="leader-val">144k 🪙</span></div>
+                        <div class="leader-item"><span class="leader-rank">#6</span> <span class="leader-name">kotost'</span> <span class="leader-val">98k 🪙</span></div>
+                        <div class="leader-item"><span class="leader-rank">#7</span> <span class="leader-name">Kanye East</span> <span class="leader-val">64k 🪙</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая стопка из двух малых окон -->
+            <div class="canvas-right-stack">
+
+                <!-- Окно 5: Малое окно статуса сети -->
+                <div class="terminal-window window-sub-top">
+                    <div class="terminal-window-header">
+                        <span class="window-title-text">СЕТЬ</span>
+                        <div class="window-controls">
+                            <span class="win-btn">_</span>
+                            <span class="win-btn">□</span>
+                            <span class="win-btn win-close">×</span>
+                        </div>
+                    </div>
+                    <div class="terminal-window-body">
+                        <div class="diag-info">
+                            <div>ПИНГ: <span class="feed-gold">14 ms</span></div>
+                            <div>UPTIME: <span class="feed-gold">99.8%</span></div>
+                            <div>ХЭШ: <span class="feed-gold">SHA-256</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Окно 6: Нижнее окно со сплошной гифкой кота -->
+                <div class="terminal-window window-sub-bottom">
+                    <div class="terminal-window-header">
+                        <span class="window-title-text">КОТОСТЬ</span>
+                        <div class="window-controls">
+                            <span class="win-btn">_</span>
+                            <span class="win-btn">□</span>
+                            <span class="win-btn win-close">×</span>
+                        </div>
+                    </div>
+                    <div class="terminal-window-body terminal-gif-body">
+                        <img class="terminal-cat-gif" src="{{ url_for('static', filename='images/cat.gif') }}" alt="clapping cat">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

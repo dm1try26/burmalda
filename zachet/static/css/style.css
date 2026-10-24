@@ -1,0 +1,1256 @@
+/* ==========================================================================
+   СТИЛИ АПГРЕЙДЕРА «ЗАЧЁТ» (CYBEROS 1984 / AMBER CRT)
+   ========================================================================== */
+
+:root {
+  /* Палитра янтарного терминала */
+  --bg: #0a0400;
+  --panel: rgba(18, 8, 0, 0.92);
+  --slot: #130700;
+  --slot2: #240e00;
+  --line: rgba(255, 157, 0, 0.28);
+  --line2: rgba(255, 157, 0, 0.5);
+  --fg: var(--amber-bright, #ffb732);
+  --muted: rgba(255, 183, 50, 0.65);
+  --dim: rgba(255, 157, 0, 0.4);
+  --accent: var(--amber-solid, #ff9d00);
+  --accent-ink: #0a0400;
+  --win: #ffd276;
+  --lose: #ff453a;
+
+  /* Градации редкости предметов */
+  --r1: #8a857b; /* Бесполезное */
+  --r2: #38a3ff; /* Пригодится */
+  --r3: #bd6eff; /* Полезное */
+  --r4: #ff3377; /* Очень нужное */
+  --r5: #ffb732; /* Незаменимое */
+
+  --display: 'Cascadia Mono', Consolas, monospace;
+  --body: 'Cascadia Mono', Consolas, monospace;
+  --mono: 'Cascadia Mono', Consolas, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+.zachet-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.zachet-terminal-window {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.zachet-body {
+  padding: 20px !important;
+}
+
+/* --------------------------------------------------------------------------
+   1. БЕГУЩАЯ СТРОКА ВЫПАДЕНИЙ (FEED)
+   -------------------------------------------------------------------------- */
+.feed-terminal-bar {
+  display: flex;
+  align-items: stretch;
+  background: rgba(10, 4, 0, 0.95);
+  border: 1px solid var(--line2);
+  height: 52px;
+  overflow: hidden;
+  box-shadow: 0 0 14px rgba(255, 157, 0, 0.1);
+}
+
+.feed-label-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  background: rgba(255, 157, 0, 0.12);
+  border-right: 1px solid var(--line2);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+  letter-spacing: 1px;
+  flex: none;
+}
+
+.feed-label-tag i {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  display: block;
+}
+
+.feedrow {
+  display: flex;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.chip {
+  flex: none;
+  width: 140px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border-right: 1px dashed var(--line);
+  position: relative;
+  background: #0d0500;
+}
+
+.chip::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--rc);
+}
+
+.chip svg {
+  width: 50px;
+  height: 26px;
+  flex: none;
+}
+
+.chip div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.chip b {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--fg);
+}
+
+.chip span {
+  font-size: 10px;
+  color: var(--dim);
+  font-family: var(--mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip.me span {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.chip.new {
+  animation: slide .35s ease-out;
+}
+
+@keyframes slide {
+  from { margin-left: -140px; }
+}
+
+/* --------------------------------------------------------------------------
+   2. ШАПКА ОКНА И ВКЛАДКИ
+   -------------------------------------------------------------------------- */
+.zachet-win-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.zachet-header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.tabs button {
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--text-black);
+  background: transparent;
+  padding: 4px 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.tabs button:hover {
+  background: rgba(10, 4, 0, 0.2);
+}
+
+.tabs button[aria-current="page"] {
+  background: var(--text-black);
+  color: var(--amber-solid);
+  border: 1px solid var(--text-black);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.zachet-header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wallet {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-black);
+}
+
+.wallet-tag {
+  font-size: 11px;
+}
+
+.mute-btn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--text-black);
+  display: grid;
+  place-items: center;
+  color: var(--text-black);
+  cursor: pointer;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.mute-btn:hover {
+  background: var(--text-black);
+  color: var(--amber-solid);
+}
+
+.mute-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   3. РАБОЧАЯ ЗОНА АПГРЕЙДА (BENCH) И ФИКС БЛОКА СТАВКИ
+   -------------------------------------------------------------------------- */
+.page[hidden] {
+  display: none !important;
+}
+
+.bench {
+  display: grid;
+  grid-template-columns: 1fr minmax(310px, 420px) 1fr;
+  border: 1px solid var(--line2);
+  background: var(--panel);
+}
+
+.col {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.col + .col {
+  border-left: 1px solid var(--line);
+}
+
+.col .hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.col .val {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 38px;
+  line-height: 1;
+  color: var(--fg);
+  text-shadow: 0 0 12px var(--amber-glow);
+}
+
+.col .val small {
+  font-size: 14px;
+  color: var(--muted);
+  margin-left: 6px;
+}
+
+/* Блок ставки: расширенная ячейка без горизонтального выпадения текста */
+.stake {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+  gap: 6px;
+  background: #080301;
+  border: 1px solid var(--line);
+  padding: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Мини-карточка внутри блока ставки */
+.stake .slot {
+  padding: 8px 6px;
+  background: var(--slot);
+  overflow: hidden !important;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: none;
+}
+
+.stake .slot .art {
+  height: 44px;
+  margin-bottom: 4px;
+}
+
+.stake .slot .art svg {
+  height: 38px;
+}
+
+/* Скрываем категории и редкости в мини-карточке ставки */
+.stake .slot .ty,
+.stake .slot .wr,
+.stake .slot .flt {
+  display: none !important;
+}
+
+/* Название предмета в ставке переносится на две строки */
+.stake .slot .nm {
+  font-size: 11px;
+  line-height: 1.25;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 28px;
+  color: #ffffff;
+}
+
+.stake .slot .ft {
+  margin-top: auto;
+  padding-top: 4px;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  overflow: hidden;
+}
+
+.stake .slot .pr {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--amber-bright, #ffb732);
+  white-space: nowrap;
+}
+
+.note {
+  color: var(--dim);
+  font-size: 12px;
+  padding: 24px 8px;
+  text-align: center;
+  border: 1px dashed var(--line);
+}
+
+.coins {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: auto;
+}
+
+.coins label {
+  grid-column: 1 / -1;
+  background: var(--panel);
+  padding: 0 0 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.coins input {
+  border: 0;
+  background: #070301;
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--fg);
+  outline: none;
+}
+
+.coins button {
+  background: var(--slot);
+  padding: 0 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg);
+  cursor: pointer;
+  border: none;
+}
+
+.coins button:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* --------------------------------------------------------------------------
+   4. ЦИФЕРБЛАТ АПГРЕЙДЕРА (DIAL)
+   -------------------------------------------------------------------------- */
+.dial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding-block: 20px;
+}
+
+.face {
+  position: relative;
+  width: 100%;
+  max-width: 310px;
+  aspect-ratio: 1;
+}
+
+.face svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#needle {
+  transition: transform 5s cubic-bezier(.12, .68, .1, 1);
+}
+
+#needle.now {
+  transition: none;
+}
+
+.readout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.readout b {
+  font-family: var(--mono);
+  font-size: clamp(30px, 6.5vw, 42px);
+  font-weight: 800;
+  color: var(--fg);
+  text-shadow: 0 0 16px var(--amber-glow);
+  line-height: 1;
+}
+
+.readout span {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-top: 6px;
+}
+
+.face.win .readout b { color: var(--win); text-shadow: 0 0 16px rgba(255, 210, 118, 0.8); }
+.face.lose .readout b { color: var(--lose); text-shadow: 0 0 16px rgba(255, 69, 58, 0.8); }
+.face.win #zone { stroke: var(--win); }
+.face.lose #needleLine, .face.lose #needleTip { stroke: var(--lose); fill: var(--lose); }
+
+.specs {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--line2);
+  background: #080301;
+}
+
+.specs div {
+  padding: 8px 10px;
+  min-width: 0;
+  text-align: center;
+}
+
+.specs div + div {
+  border-left: 1px solid var(--line);
+}
+
+.specs b {
+  display: block;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--fg);
+  margin-top: 2px;
+}
+
+.run-btn {
+  width: 100%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 13px;
+  cursor: pointer;
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 16px var(--amber-glow);
+  transition: all 0.15s ease;
+}
+
+.run-btn:hover:not(:disabled) {
+  background: var(--amber-bright);
+  box-shadow: 0 0 24px var(--amber-glow);
+  transform: translateY(-2px);
+}
+
+.run-btn:disabled {
+  background: rgba(255, 157, 0, 0.12);
+  color: var(--dim);
+  border-color: rgba(255, 157, 0, 0.2);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.why {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  min-height: 18px;
+}
+
+.bench.flash-win { animation: fw 1s; }
+.bench.flash-lose { animation: fl .5s; }
+@keyframes fw { 0%, 60% { box-shadow: inset 0 0 0 2px var(--win); } }
+@keyframes fl { 0%, 20%, 60% { box-shadow: inset 0 0 0 2px var(--lose); } 40%, 80% { box-shadow: none; } }
+
+/* --------------------------------------------------------------------------
+   5. ЦЕЛЬ (TARGET)
+   -------------------------------------------------------------------------- */
+.target {
+  --rc: var(--line2);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  min-height: 220px;
+}
+
+.target .pic {
+  display: grid;
+  place-items: center;
+  padding: 14px 0 20px;
+  border-bottom: 2px solid var(--rc);
+  background: linear-gradient(0deg, color-mix(in srgb, var(--rc) 20%, transparent), transparent 75%);
+}
+
+.target .pic svg {
+  width: min(260px, 100%);
+  height: auto;
+}
+
+.target .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  padding-top: 14px;
+}
+
+.target .meta h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--fg);
+}
+
+.target .meta .ty {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.target .meta .rr {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--rc);
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.target .meta .pr {
+  font-size: 18px;
+  color: var(--fg);
+  font-weight: 800;
+}
+
+/* --------------------------------------------------------------------------
+   6. СПИСКИ ИНВЕНТАРЯ И ЦЕЛЕЙ
+   -------------------------------------------------------------------------- */
+.lists {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.box {
+  background: var(--panel);
+  border: 1px solid var(--line2);
+  min-width: 0;
+}
+
+.bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: #0a0400;
+}
+
+.bar h3 {
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--accent);
+  margin-right: auto;
+}
+
+.field {
+  background: #050201;
+  border: 1px solid var(--line2);
+  color: var(--fg);
+  padding: 6px 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  outline: none;
+}
+
+.field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--amber-glow);
+}
+
+.btn {
+  border: 1px solid var(--line2);
+  padding: 6px 12px;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 12px;
+  background: var(--slot);
+  color: var(--fg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn.pri {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+.mults {
+  display: flex;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.mults button {
+  background: var(--slot);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 9px;
+  cursor: pointer;
+  border: none;
+}
+
+.mults button:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.scroll {
+  max-height: 480px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) #0a0400;
+}
+
+/* --------------------------------------------------------------------------
+   7. КАРТОЧКА ПРЕДМЕТА (SLOT)
+   -------------------------------------------------------------------------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.slot {
+  --rc: var(--r1);
+  position: relative;
+  background: var(--slot);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  transition: background 0.12s;
+  color: var(--fg);
+  font-family: var(--mono);
+  overflow: hidden !important;
+  min-width: 0;
+}
+
+.slot::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--rc);
+}
+
+button.slot:hover:not(:disabled) {
+  background: var(--slot2);
+}
+
+.slot .art {
+  height: 68px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 4px;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--rc) 16%, transparent), transparent 70%);
+}
+
+.slot .art svg {
+  width: 100%;
+  max-width: 140px;
+  height: 58px;
+}
+
+.slot .ty {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slot .nm {
+  font-weight: 800;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+
+.slot .ft {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.slot .wr {
+  font-size: 10px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.slot .pr {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.slot.on {
+  background: var(--slot2);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.slot.on .tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+}
+
+.slot:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.slot .acts {
+  display: flex;
+  gap: 1px;
+  margin: 8px -10px -10px -10px;
+  border-top: 1px solid var(--line);
+}
+
+.slot .acts button {
+  flex: 1;
+  padding: 7px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--slot);
+  color: var(--fg);
+  cursor: pointer;
+  border: none;
+}
+
+.slot .acts button:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.flt {
+  height: 3px;
+  display: grid;
+  grid-template-columns: 7fr 8fr 23fr 7fr 55fr;
+  gap: 1px;
+  margin-top: 4px;
+  position: relative;
+}
+
+.flt i { display: block; opacity: .7; }
+.flt i:nth-child(1) { background: #4fa26b; }
+.flt i:nth-child(2) { background: #8ab04a; }
+.flt i:nth-child(3) { background: #c9b13c; }
+.flt i:nth-child(4) { background: #cf7f37; }
+.flt i:nth-child(5) { background: #b8473a; }
+.flt b {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 9px;
+  background: #fff;
+  transform: translateX(-1px);
+}
+
+.empty {
+  grid-column: 1 / -1;
+  background: var(--slot);
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty b {
+  display: block;
+  color: var(--fg);
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   8. ЯЩИКИ, МАГАЗИН И СТАТИСТИКА
+   -------------------------------------------------------------------------- */
+.phead {
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.phead h2 {
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.phead p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.crates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.crate {
+  background: var(--slot);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  color: var(--fg);
+}
+
+.crate:hover { background: var(--slot2); }
+.crate svg { width: 100%; height: 120px; margin-bottom: 8px; }
+.crate h3 { font-family: var(--display); font-weight: 800; font-size: 22px; color: var(--fg); }
+.crate p { color: var(--muted); font-size: 12px; }
+.crate .ft { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+
+.stats div {
+  background: var(--panel);
+  padding: 14px;
+}
+
+.stats b {
+  display: block;
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: 26px;
+  color: var(--fg);
+  margin-top: 4px;
+}
+
+.log {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+.log th {
+  text-align: left;
+  color: var(--accent);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.log td {
+  padding: 10px 12px;
+  border-bottom: 1px dashed var(--line);
+  color: var(--fg);
+}
+
+.st.w { color: var(--win); font-weight: 800; }
+.st.l { color: var(--lose); font-weight: 800; }
+.st.c { color: var(--accent); font-weight: 800; }
+
+/* --------------------------------------------------------------------------
+   9. МОДАЛЬНЫЕ ОКНА И РУЛЕТКА КЕЙСОВ
+   -------------------------------------------------------------------------- */
+.shade {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(5, 2, 0, 0.9);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.win-box {
+  width: min(920px, 100%);
+  background: #0c0501;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 32px var(--amber-glow);
+  overflow: hidden;
+}
+
+.win-box .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.win-box .top h2 {
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+}
+
+.win-box .body {
+  padding: 18px;
+}
+
+.x {
+  background: transparent;
+  border: 1px solid var(--accent-ink);
+  color: var(--accent-ink);
+  font-weight: 800;
+  cursor: pointer;
+  padding: 2px 8px;
+}
+
+.x:hover {
+  background: #ff453a;
+  color: #fff;
+  border-color: #ff453a;
+}
+
+/* Окно рулетки ящиков */
+.win-box .reel {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  height: 168px !important;
+  display: block !important;
+  overflow: hidden !important;
+  border: 1px solid var(--accent) !important;
+  background: #050201 !important;
+  margin: 14px 0 !important;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.95) !important;
+}
+
+.win-box .reel .tape {
+  display: flex !important;
+  flex-direction: row !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100% !important;
+  gap: 1px !important;
+  will-change: transform !important;
+}
+
+.win-box .reel .slot {
+  flex: 0 0 139px !important;
+  width: 139px !important;
+  height: 100% !important;
+  padding: 8px 6px !important;
+}
+
+.win-box .reel .slot .art {
+  height: 76px !important;
+}
+
+.win-box .reel .slot .wr,
+.win-box .reel .slot .flt {
+  display: none !important;
+}
+
+.win-box .reel .slot.hit {
+  box-shadow: inset 0 0 0 2px var(--accent) !important;
+  background: var(--slot2) !important;
+}
+
+.win-box .reel .pin {
+  position: absolute !important;
+  left: 50% !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 2px !important;
+  background: var(--amber-bright) !important;
+  z-index: 10 !important;
+  box-shadow: 0 0 10px var(--accent) !important;
+}
+
+/* --------------------------------------------------------------------------
+   10. ВОССТАНОВЛЕНИЕ ДВУХКОЛОНОЧНОГО МАКЕТА ПОБЕДЫ/ВЫПАДЕНИЯ (.RESULT)
+   -------------------------------------------------------------------------- */
+.result {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) !important;
+  gap: 0 !important;
+  --rc: var(--accent);
+  background: #090401 !important;
+  min-height: 380px;
+}
+
+/* Левая половина: крупная картинка с неоновым свечением редкости */
+.result .pic {
+  display: grid !important;
+  place-items: center !important;
+  padding: 32px 20px !important;
+  border-right: 1px solid var(--line) !important;
+  border-bottom: 3px solid var(--rc) !important;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--rc) 22%, transparent), transparent 75%) !important;
+}
+
+.result .pic svg {
+  width: 100% !important;
+  max-width: 330px !important;
+  height: auto !important;
+  animation: in .45s cubic-bezier(.2, .9, .3, 1);
+}
+
+@keyframes in {
+  from { transform: translateX(-24px); opacity: 0; }
+}
+
+/* Правая половина: заголовок, параметры и кнопки действий */
+.result .info {
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  background: #0d0601 !important;
+}
+
+.result .rr {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--rc);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.result .info h3 {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 32px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 4px 0 10px 0;
+}
+
+/* Таблица параметров (Износ, Шанс, Выпало, Ставка, Цена) в две ровные колонки */
+.result dl {
+  display: grid !important;
+  grid-template-columns: auto 1fr !important;
+  gap: 6px 18px !important;
+  margin: 6px 0 16px 0 !important;
+  font-size: 13px !important;
+}
+
+.result dt {
+  color: var(--muted) !important;
+  font-family: var(--mono) !important;
+}
+
+.result dd {
+  margin: 0 !important;
+  font-family: var(--mono) !important;
+  font-weight: 700 !important;
+  color: var(--fg) !important;
+}
+
+.result .actions {
+  display: flex !important;
+  gap: 10px !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  margin-top: auto !important;
+  padding-top: 16px !important;
+}
+
+.result .actions .btn {
+  padding: 10px 18px !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+/* Список сгоревших предметов при неудаче */
+.lostlist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 12px;
+}
+
+.lostlist .slot {
+  opacity: .55;
+  filter: grayscale(.8);
+  padding: 6px;
+}
+
+.lostlist .slot .art { height: 44px; }
+.lostlist .slot .wr, .lostlist .slot .flt, .lostlist .slot .ty { display: none !important; }
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: 13px;
+  padding: 10px 18px;
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+  box-shadow: 0 0 16px var(--amber-glow);
+}
+
+.toast.on {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 1024px) {
+  .bench { grid-template-columns: 1fr; }
+  .col + .col { border-left: 0; border-top: 1px solid var(--line); }
+  .lists { grid-template-columns: 1fr; }
+  .result { grid-template-columns: 1fr !important; }
+  .result .pic { border-right: none !important; border-bottom: 2px solid var(--rc) !important; }
+}

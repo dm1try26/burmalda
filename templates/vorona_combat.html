@@ -1,0 +1,88 @@
+{# наследование настроек от базы.хтмл#}
+{% extends 'base.html' %}
+
+{# название страницы #}
+{% block title %}тапалка{% endblock %}
+{# тело #}
+{% block body %}
+<h1>Тапай ворону - лутай кещ</h1>
+
+<style>
+    .crow-zone {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 40px;
+    }
+    .crow {
+        font-size: 160px;
+        line-height: 1;
+        background: none;
+        border: none;
+        cursor: pointer;
+        filter: brightness(0);      /* делает птицу чёрной — ворона */
+        transition: transform 0.08s;
+        user-select: none;
+    }
+    .crow:active {
+        transform: scale(0.88);     /* ворона «сжимается» при нажатии */
+    }
+    .plus {
+        position: absolute;
+        top: 0;
+        font-size: 28px;
+        font-weight: bold;
+        color: #e0b44c;
+        pointer-events: none;
+        animation: fly 0.8s ease-out forwards;
+    }
+    @keyframes fly {
+        from { opacity: 1; transform: translateY(0); }
+        to   { opacity: 0; transform: translateY(-80px); }
+    }
+</style>
+
+<div class="crow-zone" id="crow-zone">
+    {% if current_user %}
+        <button class="crow" id="crow">🐦</button>
+        <p class="mt-3">Один тап = <b>1000</b> монет</p>
+        <p id="tap-error" class="text-danger"></p>
+    {% else %}
+        <p>Чтобы лутать кещ, нужно <a href="{{ url_for('login') }}">войти</a>.</p>
+    {% endif %}
+</div>
+
+<script>
+    const crow = document.getElementById('crow');
+
+    if (crow) {
+        crow.addEventListener('click', function (event) {
+            // отправляем тап на сервер
+            fetch("{{ url_for('vorona_combat') }}", { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('tap-error').innerText = data.error;
+                        return;
+                    }
+                    // обновляем баланс в шапке
+                    document.getElementById('header-balance').innerText = data.balance;
+                    showPlus(event);
+                });
+        });
+    }
+
+    // летящая надпись «+1000» над вороной
+    function showPlus(event) {
+        const zone = document.getElementById('crow-zone');
+        const plus = document.createElement('div');
+        plus.className = 'plus';
+        plus.innerText = '+1000';
+        plus.style.left = (event.offsetX + crow.offsetLeft) + 'px';
+        zone.appendChild(plus);
+        setTimeout(() => plus.remove(), 800);
+    }
+</script>
+
+{% endblock %}
